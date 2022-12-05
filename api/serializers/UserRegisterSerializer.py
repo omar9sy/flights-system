@@ -8,17 +8,19 @@ class UserRegisterSerializer(RegisterSerializer):
     phone_number = serializers.CharField(max_length=11, required=False)
     country = serializers.CharField(max_length=20, required=False)
     city = serializers.CharField(max_length=20, required=False)
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = AppUser
         fields = (
-            'name',
             'email',
-            'password1',
-            'password2',
             'phone_number',
             'country',
-            'city'
+            'city',
+            'first_name',
+            'last_name'
         )
 
     def create(self, validated_data):
