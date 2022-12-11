@@ -24,17 +24,14 @@ class Trip(models.Model):
     def get_offer_cost(self):
         cur_date = datetime.now().date()
         diff = cur_date - self.departure_date
-        
+
         discount = 1.0
 
         if diff.days > 30:
             discount = 0.75
         elif diff.days > 20:
             discount = 0.85
-        else:
-            #diff.days > 10:
+        elif diff.days > 1:
             discount = 0.95
-        
-        return self.cost*discount
 
-        
+        return self.cost * discount

@@ -10,4 +10,4 @@ class AppUser(AbstractUser):
     city = models.CharField(max_length=20)
 
     def __str__(self):
-        return self.get_full_name() if self.get_full_name()!='' else self.username
+        return self.get_full_name() if self.get_full_name() != '' else self.username

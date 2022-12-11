@@ -1,16 +1,15 @@
-from api.views import get_trips, AirportViewSet
+from api.views import book_seat, AirportViewSet
 from dj_rest_auth.registration.views import RegisterView
-from django.urls import path
 from dj_rest_auth.views import (
-    LoginView, LogoutView, PasswordChangeView, PasswordResetConfirmView,
-    PasswordResetView, UserDetailsView,
+    LoginView, LogoutView, UserDetailsView,
 )
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
     # path('airports', get_airports),
     # path('airports/<int:pk>', get_airport),
-    path('trips', get_trips),
+    path('trips/<int:pk>/book/<int:seat_id>', book_seat),
 
     path('account/login/', LoginView.as_view(), name='rest_login'),
     path('account/logout/', LogoutView.as_view(), name='rest_logout'),
@@ -22,4 +21,4 @@ urlpatterns = [
 
 router = DefaultRouter()
 router.register(r'airports', AirportViewSet, basename='airport')
-urlpatterns+=router.urls
+urlpatterns += router.urls

@@ -1,23 +1,12 @@
-from api.models import Trip, Seat
+from api.models import Trip
 from rest_framework import serializers
-from datetime import datetime
-
-class SeatSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Seat
-        fields = [
-            'id',
-            'level',
-            'row',
-            'number',
-            'booked',
-        ]
+from . import SeatSerializer
 
 
 class TripSerializer(serializers.ModelSerializer):
     seats = SeatSerializer(many=True, read_only=True)
-    offer_cost = serializers.DecimalField(source='get_offer_cost', read_only=True, 
-    max_digits=12, decimal_places=2)
+    offer_cost = serializers.DecimalField(source='get_offer_cost', read_only=True,
+                                          max_digits=12, decimal_places=2)
 
     class Meta:
         model = Trip
@@ -33,3 +22,12 @@ class TripSerializer(serializers.ModelSerializer):
             'offer_cost'
         ]
 
+
+class BookTripSerializer(serializers.Serializer):
+    seat_id = serializers.IntegerField()
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass

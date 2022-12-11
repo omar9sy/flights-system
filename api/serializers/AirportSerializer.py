@@ -9,7 +9,7 @@ class AirportTripSerializer(serializers.ModelSerializer):
 
 
 class AirportSerializer(serializers.ModelSerializer):
-    trips = AirportTripSerializer(many=True,read_only=True)
+    trips = AirportTripSerializer(many=True, read_only=True)
 
     class Meta:
         model = Airport
