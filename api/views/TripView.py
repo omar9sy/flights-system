@@ -11,7 +11,7 @@ from rest_framework.response import Response
 )
 @api_view(['GET'])
 def get_trips(request):
-    query = Trip.objects.prefetch_related('trips').all()
+    query = Trip.objects.all()
     serializer = TripSerializer(query, many=True)
     result = {'result': serializer.data}
     return Response(result, status=status.HTTP_200_OK)

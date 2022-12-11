@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.openid'
 ]
 
 REST_FRAMEWORK = {
