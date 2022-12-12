@@ -23,11 +23,15 @@ class TripSerializer(serializers.ModelSerializer):
         ]
 
 
-class BookTripSerializer(serializers.Serializer):
-    seat_id = serializers.IntegerField()
-
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
+class TripCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trip
+        fields = [
+            'departure_date',
+            'departure_time',
+            'arrival_date',
+            'arrival_time',
+            'destination_country',
+            'destination_city',
+            'cost',
+        ]

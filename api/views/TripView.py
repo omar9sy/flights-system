@@ -1,10 +1,23 @@
 from api.models import Trip, Seat, TripReservation
-from api.serializers import TripSerializer
+from api.permissions import IsAirport
+from api.serializers import TripSerializer, TripCreateSerializer
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+
+@extend_schema(
+    request=TripCreateSerializer,
+    responses=TripCreateSerializer
+)
+@api_view(['POST'])
+@permission_classes([IsAirport])
+def create_trip(request):
+    serializer = TripCreateSerializer(request.data)
+    serializer.is_valid(raise_exception=True)
+    pass
 
 
 @api_view(['POST'])
