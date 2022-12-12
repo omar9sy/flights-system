@@ -10,6 +10,7 @@ class AirportTripSerializer(serializers.ModelSerializer):
 
 class AirportSerializer(serializers.ModelSerializer):
     trips = AirportTripSerializer(many=True, read_only=True)
+    photo = serializers.SerializerMethodField()
 
     class Meta:
         model = Airport
@@ -22,3 +23,8 @@ class AirportSerializer(serializers.ModelSerializer):
         instance.photo = photo
         instance.save()
         return instance
+
+    def get_photo_url(self, instance):
+        request = self.context.get('request')
+        photo_url = instance.photo.url
+        return request.build_absolute_uri(photo_url)

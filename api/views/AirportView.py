@@ -14,7 +14,7 @@ class AirportViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         data = self.queryset
-        serializer = self.serializer_class(data,many=True)
+        serializer = self.get_serializer_class()(data, many=True)
         return Response({'result': serializer.data})
 
     def retrieve(self, request, *args, **kwargs):
