@@ -9,6 +9,7 @@ class AppUser(AbstractUser):
     country = models.CharField(max_length=20)
     city = models.CharField(max_length=20)
     is_airport = models.BooleanField(default=False)
+    balance = models.DecimalField(default=0)
 
     def __str__(self):
         return self.get_full_name() if self.get_full_name() != '' else self.username
