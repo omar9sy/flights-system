@@ -14,24 +14,7 @@ class Trip(models.Model):
     destination_country = models.CharField(max_length=50)
     destination_city = models.CharField(max_length=50)
 
-    cost = models.IntegerField()
     airport = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name='trips')
 
     def __str__(self):
         return self.destination_city
-
-    @property
-    def get_offer_cost(self):
-        cur_date = datetime.now().date()
-        diff = cur_date - self.departure_date
-
-        discount = 1.0
-
-        if diff.days > 30:
-            discount = 0.75
-        elif diff.days > 20:
-            discount = 0.85
-        elif diff.days > 1:
-            discount = 0.95
-
-        return self.cost * discount

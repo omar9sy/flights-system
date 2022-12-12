@@ -3,12 +3,15 @@ from rest_framework import serializers
 
 
 class SeatSerializer(serializers.ModelSerializer):
+    offer_cost = serializers.DecimalField(source='get_offer_cost', read_only=True,
+                                          max_digits=12, decimal_places=2)
+
     class Meta:
         model = Seat
         fields = [
             'id',
             'level',
-            'row',
-            'number',
             'booked',
+            'cost',
+            'offer_cost'
         ]
