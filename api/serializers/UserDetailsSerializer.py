@@ -17,7 +17,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             'last_name',
             'city',
             'country',
-            # 'balance'
+            'balance'
         )
 
     def to_representation(self, instance):

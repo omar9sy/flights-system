@@ -1,4 +1,4 @@
-from api.models import Trip, Seat, TripReservation, Airport
+from api.models import Trip, Seat, TripReservation, Airport, AppUser
 from api.permissions import IsAirport
 from api.serializers import TripSerializer, TripCreateSerializer
 from django.shortcuts import get_object_or_404
@@ -58,6 +58,32 @@ def get_trip(request, pk):
     return Response({'result': serializer.data})
 
 
+@extend_schema(
+    responses=TripSerializer
+)
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_user_trips(request):
+    user = request.user
+    obj = TripReservation.objects.prefetch_related('trip_reservations').filter(user=user)
+    data = [i.trip for i in obj]
+    serializer = TripSerializer(data)
+    return Response({'result': serializer.data})
+
+
+@extend_schema(
+    responses=TripSerializer
+)
+@permission_classes([IsAuthenticated, IsAirport])
+@api_view(['GET'])
+def get_airport_trips(request, pk):
+    trip = get_object_or_404(Trip, pk=pk)
+    obj = TripReservation.objects.prefetch_related('trip_reservations').filter(trip=trip)
+    data = [i.trip for i in obj]
+    serializer = TripSerializer(data)
+    return Response({'result': serializer.data})
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def book_seat(request, pk, seat_id):
@@ -65,10 +91,15 @@ def book_seat(request, pk, seat_id):
     if seat.booked:
         return Response({'message': 'this seat is booked'}, status=status.HTTP_400_BAD_REQUEST)
 
-    user = request.user
+    user = AppUser.objects.get(pk=request.user.id)
     trip = get_object_or_404(Trip, pk=pk)
+    if user.balance < seat.get_offer_cost:
+        return Response({'error': 'insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
+
     obj = TripReservation.objects.create(trip=trip, seat=seat, user=user, cost=seat.get_offer_cost)
     obj.save()
     seat.booked = True
     seat.save()
+    user.balance -= seat.get_offer_cost
+    user.save()
     return Response({'message': 'seat booked'}, status=status.HTTP_201_CREATED)
