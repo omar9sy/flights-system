@@ -14,12 +14,12 @@ class AirportViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         data = self.queryset
-        serializer = self.get_serializer_class()(data, many=True)
+        serializer = self.get_serializer(data, many=True)
         return Response({'result': serializer.data})
 
     def retrieve(self, request, *args, **kwargs):
         data = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        serializer = self.serializer_class(data)
+        serializer = self.get_serializer(data)
         return Response({'result': serializer.data})
 
     def perform_create(self, serializer):
