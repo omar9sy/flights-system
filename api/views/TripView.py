@@ -20,6 +20,16 @@ def create_trip(request):
     pass
 
 
+@extend_schema(
+    responses=TripSerializer
+)
+@api_view(['GET'])
+def get_trip(request, pk):
+    obj = Trip.objects.get(pk=pk)
+    serializer = TripSerializer(obj)
+    return Response({'result': serializer.data})
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def book_seat(request, pk, seat_id):

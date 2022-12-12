@@ -1,4 +1,4 @@
-from api.views import book_seat, AirportViewSet, create_trip
+from api.views import book_seat, AirportViewSet, create_trip, get_trip
 from api.views.CommentView import get_comments
 from dj_rest_auth.registration.views import RegisterView
 from dj_rest_auth.views import (
@@ -11,6 +11,7 @@ urlpatterns = [
     # path('airports', get_airports),
     # path('airports/<int:pk>', get_airport),
     path('trips', create_trip),
+    path('trips/<int:pk>', get_trip),
     path('trips/<int:pk>/book/<int:seat_id>', book_seat),
     path('comments', get_comments),
     path('account/login/', LoginView.as_view(), name='rest_login'),
