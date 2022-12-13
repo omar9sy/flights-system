@@ -1,6 +1,6 @@
 from api.models import Trip, Seat, TripReservation, Airport, AppUser
 from api.permissions import IsAirport
-from api.serializers import TripSerializer, TripCreateSerializer
+from api.serializers import TripSerializer, TripCreateSerializer, TripReservationSerializer
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -18,30 +18,22 @@ from rest_framework.response import Response
 def create_trip(request):
     serializer = TripCreateSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    # return Response(serializer.data)
     airport = Airport.objects.filter(author=request.user).first()
-    # return Response(airport.id)
     data = serializer.data
-    trip = Trip.objects.create(
-        departure_date=data.get('departure_date'),
-        departure_time=data.get('departure_time'),
-        arrival_date=data.get('arrival_date'),
-        arrival_time=data.get('arrival_time'),
-        destination_country=data.get('destination_country'),
-        destination_city=data.get('destination_city'),
-        airport=airport
-    )
+    costs = [data.pop('level_1_cost'), data.pop('level_2_cost'), data.pop('level_3_cost')]
+
+    trip = Trip.objects.create(**data, airport=airport)
     trip.save()
     for i in range(10):
-        obj = Seat.objects.create(trip=trip, level=1, cost=data.get('level_1_cost'))
+        obj = Seat.objects.create(trip=trip, level=1, cost=costs[0])
         obj.save()
 
     for i in range(20):
-        obj = Seat.objects.create(trip=trip, level=2, cost=data.get('level_2_cost'))
+        obj = Seat.objects.create(trip=trip, level=2, cost=costs[1])
         obj.save()
 
     for i in range(30):
-        obj = Seat.objects.create(trip=trip, level=2, cost=data.get('level_3_cost'))
+        obj = Seat.objects.create(trip=trip, level=2, cost=costs[2])
         obj.save()
 
     result = TripSerializer(trip)
@@ -65,9 +57,8 @@ def get_trip(request, pk):
 @api_view(['GET'])
 def get_user_trips(request):
     user = request.user
-    obj = TripReservation.objects.prefetch_related('trip_reservations').filter(user=user)
-    data = [i.trip for i in obj]
-    serializer = TripSerializer(data)
+    data = TripReservation.objects.filter(user=user)
+    serializer = TripReservationSerializer(data, many=True)
     return Response({'result': serializer.data})
 
 
@@ -76,11 +67,11 @@ def get_user_trips(request):
 )
 @permission_classes([IsAuthenticated, IsAirport])
 @api_view(['GET'])
-def get_airport_trips(request, pk):
+def get_airport_trip_reservations(request, pk):
     trip = get_object_or_404(Trip, pk=pk)
-    obj = TripReservation.objects.prefetch_related('trip_reservations').filter(trip=trip)
-    data = [i.trip for i in obj]
-    serializer = TripSerializer(data)
+    # airport = Airport.objects.filter(author=request.user).first()
+    data = TripReservation.objects.filter(trip=trip)
+    serializer = TripReservationSerializer(data, many=True)
     return Response({'result': serializer.data})
 
 

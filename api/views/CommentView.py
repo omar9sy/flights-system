@@ -1,7 +1,7 @@
 from api.models import Comment
 from api.serializers import CommentSerializer, CommentCreateSerializer
 from drf_spectacular.utils import extend_schema
-from rest_framework import status, permissions
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
