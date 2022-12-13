@@ -10,7 +10,6 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         model = AppUser
         fields = (
             'pk',
-            'first_name',
             'email',
             'phone_number',
             'first_name',
