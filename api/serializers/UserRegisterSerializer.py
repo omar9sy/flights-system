@@ -36,6 +36,6 @@ class UserRegisterSerializer(RegisterSerializer):
         user.city = self.data.get('city')
         user.country = self.data.get('country')
         user.first_name = self.data.get('first_name')
-        user.first_name = self.data.get('last_name')
+        user.last_name = self.data.get('last_name')
         user.save()
         return user
