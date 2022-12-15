@@ -59,8 +59,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'COERCE_DECIMAL_TO_STRING': False,
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    # 'PAGE_SIZE': 1000
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {

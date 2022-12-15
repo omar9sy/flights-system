@@ -4,4 +4,5 @@ from .Trip import *
 from .Seat import *
 from .TripReservation import *
 from .Comment import *
-
+from .Hotel import *
+from .Restaurant import *

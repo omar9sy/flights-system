@@ -24,7 +24,7 @@ class AirportSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def get_photo(self, instance):
+    def get_photo(self, instance) -> str:
         request = self.context.get('request')
         photo_url = instance.photo.url
         return request.build_absolute_uri(photo_url)

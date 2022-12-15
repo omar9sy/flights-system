@@ -1,6 +1,8 @@
-from api.models import Trip, Seat, TripReservation, Airport, AppUser
+import decimal
+from api.models import Trip, Seat, TripReservation, Airport, AppUser, Restaurant, Hotel
 from api.permissions import IsAirport
-from api.serializers import TripSerializer, TripCreateSerializer, TripReservationSerializer
+from api.serializers import TripSerializer, TripCreateSerializer, TripReservationSerializer, RestaurantSerializer, \
+    HotelSerializer, ResultSerializer
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -65,16 +67,18 @@ def get_user_trips(request):
 @extend_schema(
     responses=TripSerializer
 )
-@permission_classes([IsAuthenticated, IsAirport])
 @api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAirport])
 def get_airport_trip_reservations(request, pk):
     trip = get_object_or_404(Trip, pk=pk)
-    # airport = Airport.objects.filter(author=request.user).first()
     data = TripReservation.objects.filter(trip=trip)
     serializer = TripReservationSerializer(data, many=True)
     return Response({'result': serializer.data})
 
 
+@extend_schema(
+    responses=ResultSerializer
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def book_seat(request, pk, seat_id):
@@ -91,6 +95,16 @@ def book_seat(request, pk, seat_id):
     obj.save()
     seat.booked = True
     seat.save()
-    user.balance -= seat.get_offer_cost
+    user.balance -= decimal.Decimal(seat.get_offer_cost)
     user.save()
+    cnt = TripReservation.objects.filter(user=user).count()
+    if cnt >= 3:
+        restaurants = Restaurant.objects.filter(city=trip.destination_city).all()
+        restaurants_serializer = RestaurantSerializer(restaurants, many=True)
+
+        hotels = Hotel.objects.filter(city=trip.destination_city).all()
+        hotels_serializer = HotelSerializer(hotels, many=True)
+
+        return Response({'hotels': hotels_serializer.data, 'restaurants': restaurants_serializer.data})
+
     return Response({'message': 'seat booked'}, status=status.HTTP_201_CREATED)
