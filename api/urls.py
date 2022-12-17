@@ -4,7 +4,7 @@ from api.views import (
 from api.views.CommentView import get_comments
 from dj_rest_auth.registration.views import RegisterView
 from dj_rest_auth.views import (
-    LoginView, LogoutView, UserDetailsView,
+    LoginView, LogoutView, UserDetailsView, PasswordChangeView,
 )
 from django.urls import path
 from rest_framework.routers import DefaultRouter
@@ -21,6 +21,7 @@ urlpatterns = [
     path('account/login/', LoginView.as_view(), name='rest_login'),
     path('account/logout/', LogoutView.as_view(), name='rest_logout'),
     path('account/user/', UserDetailsView2.as_view(), name='rest_user_details'),
+    path('account/user/change-password', PasswordChangeView.as_view(), name='rest_change_reset'),
     # path('account/', include('dj_rest_auth.urls')),
     path('account/registration/', RegisterView.as_view(), name='rest_register'),
     # path('account/registration/', include('dj_rest_auth.registration.urls'))
