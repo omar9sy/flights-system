@@ -18,7 +18,7 @@ class ApiConfig(AppConfig):
             fail_silently=False,
         )
 
-    def ready(self):
+    def run(self):
         from .models import TripReservation
 
         print('test')
@@ -30,4 +30,9 @@ class ApiConfig(AppConfig):
                 if diff.days <= 1:
                     print(reservation.user.email)
                     self.send(reservation.user, reservation.trip)
-            time.sleep(3600)
+            break
+            # time.sleep(3600)
+
+    def ready(self):
+        self.run()
+
