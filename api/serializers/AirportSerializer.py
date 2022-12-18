@@ -10,13 +10,13 @@ class AirportTripSerializer(serializers.ModelSerializer):
 
 class AirportSerializer(serializers.ModelSerializer):
     trips = AirportTripSerializer(many=True, read_only=True)
-    photo = serializers.SerializerMethodField(read_only=True)
+    photo_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Airport
-        fields = ['id', 'name', 'city', 'country', 'trips', 'photo']
+        fields = ['id', 'name', 'city', 'country', 'trips', 'photo_url']
 
-    def get_photo(self, instance) -> str:
+    def get_photo_url(self, instance) -> str:
         request = self.context.get('request')
         photo_url = instance.photo.url
         return request.build_absolute_uri(photo_url)
