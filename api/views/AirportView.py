@@ -1,6 +1,6 @@
 from api.models import Airport
 from api.permissions import IsAirport
-from api.serializers import AirportSerializer
+from api.serializers import AirportSerializer, AirporCreatetSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -9,8 +9,12 @@ from rest_framework.response import Response
 
 class AirportViewSet(viewsets.ModelViewSet):
     queryset = Airport.objects.all()
-    serializer_class = AirportSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAirport]
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return AirporCreatetSerializer
+        return AirportSerializer
 
     def list(self, request, *args, **kwargs):
         data = self.queryset
