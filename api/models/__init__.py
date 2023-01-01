@@ -6,3 +6,4 @@ from .TripReservation import *
 from .Comment import *
 from .Hotel import *
 from .Restaurant import *
+from .AllowedEmailForAirport import *

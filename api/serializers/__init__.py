@@ -5,4 +5,6 @@ from .SeatSerializer import *
 from .TripSerializer import *
 from .CommentSerializer import *
 from .RecommendationsSerializer import *
-
+from .AllowedEmailForAirportSerializer import *
+from .AirportRegisterSerializer import *
+from .UpdateBalanceSerializer import *

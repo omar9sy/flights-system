@@ -1,9 +1,12 @@
-from api.models import Airport
+from api.models import Airport, AppUser
+from api.models import AllowedEmailForAirport
 from api.permissions import IsAirport
-from api.serializers import AirportSerializer, AirporCreatetSerializer
+from api.serializers import AirportSerializer, AirporCreatetSerializer, AllowedEmailForAirportSerializer
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from drf_spectacular.utils import extend_schema
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 
 
@@ -28,6 +31,24 @@ class AirportViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+
+@extend_schema(
+    request=AllowedEmailForAirportSerializer,
+    responses=AllowedEmailForAirportSerializer
+)
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def add_email(request):
+    email = request.data.get('Email')
+    if AllowedEmailForAirport.objects.filter(Email=email).count() != 0:
+        return Response({'error': 'email not allowed'}, status=status.HTTP_400_BAD_REQUEST)
+    if AppUser.objects().filter(email=email).count != 0:
+        return Response({'error': 'email not allowed'}, status=status.HTTP_400_BAD_REQUEST)
+    obj = AllowedEmailForAirportSerializer(data=request.data)
+    obj.is_valid(raise_exception=True)
+    obj.save()
+    return Response(obj.data, status=status.HTTP_201_CREATED)
 
 # @extend_schema(
 #     responses=AirportSerializer
