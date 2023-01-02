@@ -45,11 +45,18 @@ def create_trip(request):
 @extend_schema(
     responses=TripSerializer
 )
-@api_view(['GET'])
-def get_trip(request, pk):
-    obj = get_object_or_404(Trip, pk=pk)
-    serializer = TripSerializer(obj)
-    return Response({'result': serializer.data})
+@api_view(['GET', 'DELETE'])
+def get_delete_trip(request, pk):
+    if request.method == 'GET':
+        obj = get_object_or_404(Trip, pk=pk)
+        serializer = TripSerializer(obj)
+        return Response({'result': serializer.data})
+    else:
+        trip = get_object_or_404(Trip, pk=pk)
+        if trip.airport.author != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        trip.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @extend_schema(
@@ -108,3 +115,5 @@ def book_seat(request, pk, seat_id):
         return Response({'hotels': hotels_serializer.data, 'restaurants': restaurants_serializer.data})
 
     return Response({'message': 'seat booked'}, status=status.HTTP_201_CREATED)
+
+
