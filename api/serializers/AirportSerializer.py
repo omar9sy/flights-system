@@ -18,7 +18,7 @@ class AirportSerializer(serializers.ModelSerializer):
 
     def get_photo_url(self, instance) -> str:
         request = self.context.get('request')
-        if instance.photo is None:
+        if instance.photo is None or instance.photo == "" or instance.photo.url == "":
             return "no photo"
         photo_url = instance.photo.url
         return request.build_absolute_uri(photo_url)

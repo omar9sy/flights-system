@@ -18,15 +18,18 @@ class Seat(models.Model):
         cur_date = datetime.now().date()
         dep_date = datetime.strptime(str(self.trip.departure_date), '%Y-%m-%d').date()
         # print(dep_date)
-        diff = cur_date - dep_date
-
+        diff =  dep_date - cur_date
+        if self.cost==500:
+            print(cur_date)
+            print(dep_date)
+            print(diff)
         discount = 1.0
 
         if diff.days > 30:
             discount = 0.75
         elif diff.days > 20:
             discount = 0.85
-        elif diff.days >= 0:
+        elif diff.days > 10:
             discount = 0.95
-
+        
         return self.cost * discount
