@@ -1,7 +1,7 @@
-from api.models import Airport, AppUser
+from api.models import Airport, AppUser, Trip
 from api.models import AllowedEmailForAirport
-from api.permissions import IsAirport
-from api.serializers import AirportSerializer, AirporCreatetSerializer, AllowedEmailForAirportSerializer
+from api.permissions import IsAirport, IsAirportOrReadOnly
+from api.serializers import AirportSerializer, AirporCreatetSerializer,AllowedEmailForAirportSerializer, TripSerializer
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, status
@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 class AirportViewSet(viewsets.ModelViewSet):
     queryset = Airport.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAirport]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAirportOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
@@ -41,32 +41,28 @@ class AirportViewSet(viewsets.ModelViewSet):
 @permission_classes([IsAdminUser])
 def add_email(request):
     email = request.data.get('Email')
-    if AllowedEmailForAirport.objects.filter(Email=email).count() != 0:
-        return Response({'error': 'email not allowed'}, status=status.HTTP_400_BAD_REQUEST)
-    if AppUser.objects().filter(email=email).count != 0:
-        return Response({'error': 'email not allowed'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if AllowedEmailForAirport.objects.all().filter(Email=email).count() != 0:
+        return Response({'error': 'email not allowed1'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if AppUser.objects.all().filter(email=email).count() != 0:
+        return Response({'error': 'email not allowed2'}, status=status.HTTP_400_BAD_REQUEST)
+    
     obj = AllowedEmailForAirportSerializer(data=request.data)
     obj.is_valid(raise_exception=True)
     obj.save()
+
     return Response(obj.data, status=status.HTTP_201_CREATED)
 
-# @extend_schema(
-#     responses=AirportSerializer
-# )
-# @api_view(['GET'])
-# def get_airports(request):
-#     query = Airport.objects.all()
-#     serializer = AirportSerializer(query, many=True)
-#     result = {'result': serializer.data}
-#     return Response(result, status=status.HTTP_200_OK)
 
-
-# @extend_schema(
-#     responses=AirportSerializer
-# )
-# @api_view(['GET'])
-# def get_airport(request, pk):
-#     query = Airport.objects.get(pk=pk)
-#     serializer = AirportSerializer(query)
-#     result = {'result': serializer.data}
-#     return Response(result, status=status.HTTP_200_OK)
+@extend_schema(
+    responses=TripSerializer
+)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAirport])
+def get_airport_trips(request):
+    user = request.user
+    airport = Airport.objects.filter(author=user).first()
+    data = Trip.objects.filter(airport=airport)
+    serializer = TripSerializer(data,many=True)
+    return Response({'result': serializer.data})

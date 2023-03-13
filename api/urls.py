@@ -1,11 +1,11 @@
 from api.views import (
-    book_seat, AirportViewSet, create_trip, get_delete_trip,
+    book_seat, AirportViewSet, create_trip, get_delete_trip, search_trip, get_airport_trips,
     get_user_trips, get_airport_trip_reservations, UserDetailsView2, add_email, AirportRegisterView, LoginViewWithRole)
 from api.views.AdminView import update_balance, get_users
 from api.views.CommentView import get_comments
 from dj_rest_auth.registration.views import RegisterView
 from dj_rest_auth.views import (
-    LoginView, LogoutView, PasswordChangeView,
+    LogoutView, PasswordChangeView,
 )
 from django.urls import path
 from rest_framework.routers import DefaultRouter
@@ -18,7 +18,9 @@ urlpatterns = [
     path('trips/<int:pk>', get_delete_trip),
     path('trips/<int:pk>/reservations', get_airport_trip_reservations),
     path('trips/<int:pk>/book/<int:seat_id>', book_seat),
+    path('trips/search',search_trip),
     path('comments', get_comments),
+    path('airports/me',get_airport_trips),
     path('airports/emails', add_email),
     path('airports/register', AirportRegisterView.as_view()),
     path('users/<int:pk>/balance', update_balance),

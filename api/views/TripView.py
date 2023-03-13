@@ -4,7 +4,8 @@ from api.permissions import IsAirport
 from api.serializers import TripSerializer, TripCreateSerializer, TripReservationSerializer, RestaurantSerializer, \
     HotelSerializer, ResultSerializer
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -26,15 +27,15 @@ def create_trip(request):
 
     trip = Trip.objects.create(**data, airport=airport)
     trip.save()
-    for i in range(10):
+    for _ in range(10):
         obj = Seat.objects.create(trip=trip, level=1, cost=costs[0])
         obj.save()
 
-    for i in range(20):
+    for _ in range(20):
         obj = Seat.objects.create(trip=trip, level=2, cost=costs[1])
         obj.save()
 
-    for i in range(30):
+    for _ in range(30):
         obj = Seat.objects.create(trip=trip, level=2, cost=costs[2])
         obj.save()
 
@@ -60,7 +61,7 @@ def get_delete_trip(request, pk):
 
 
 @extend_schema(
-    responses=TripSerializer
+    responses=TripReservationSerializer
 )
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
@@ -117,3 +118,37 @@ def book_seat(request, pk, seat_id):
     return Response({'message': 'seat booked'}, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(name='day', description='day of month to search in', required=False, type=int),
+        OpenApiParameter(name='month', description='month to search in', required=False, type=int),
+        OpenApiParameter(name='destination_city', description='destination_city to get trips for', required=False, type=str),
+        OpenApiParameter(name='departure_city', description='departure_city to get trips for', required=False, type=str),
+    ],
+    responses={
+        200: TripSerializer,
+    }
+)
+@api_view(['GET'])
+def search_trip(request):
+    day = request.query_params.get('day')
+    month = request.query_params.get('month')
+    destination_city = request.query_params.get('destination_city')
+    departure_city = request.query_params.get('departure_city')
+    
+    data = Trip.objects.all()
+    if month is not None:
+        data = data.filter(departure_date__month=month)
+    
+    if day is not None:
+        data = data.filter(departure_date__day=day)
+    
+    if destination_city is not None:
+        data = data.filter(destination_city=destination_city)
+    
+    if departure_city is not None:
+        data = data.filter(airport__city=departure_city)
+
+    serializer = TripSerializer(data, many=True)
+
+    return Response({'result': serializer.data})
