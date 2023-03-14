@@ -1,16 +1,16 @@
 import decimal
 from api.models import Trip, Seat, TripReservation, Airport, AppUser, Restaurant, Hotel
-from api.permissions import IsAirport
+from api.permissions import IsAirport, IsAirportOrReadOnly
 from api.serializers import TripSerializer, TripCreateSerializer, TripReservationSerializer, RestaurantSerializer, \
     HotelSerializer, ResultSerializer
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from drf_spectacular.types import OpenApiTypes
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework import mixins, views
+from rest_framework.viewsets import GenericViewSet
 
 @extend_schema(
     request=TripCreateSerializer,
@@ -43,23 +43,18 @@ def create_trip(request):
     return Response({'result': result.data}, status=status.HTTP_201_CREATED)
 
 
-@extend_schema(
-    responses=TripSerializer
-)
-@api_view(['GET', 'DELETE'])
-def get_delete_trip(request, pk):
-    if request.method == 'GET':
-        obj = get_object_or_404(Trip, pk=pk)
-        serializer = TripSerializer(obj)
+class TripViewSet(mixins.RetrieveModelMixin,
+               mixins.UpdateModelMixin,
+               mixins.DestroyModelMixin,
+               GenericViewSet):
+    authentication_classes = [IsAuthenticated, IsAirportOrReadOnly]
+    serializer_class = TripSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
         return Response({'result': serializer.data})
-    else:
-        trip = get_object_or_404(Trip, pk=pk)
-        if trip.airport.author != request.user:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        trip.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
+    
 @extend_schema(
     responses=TripReservationSerializer
 )
