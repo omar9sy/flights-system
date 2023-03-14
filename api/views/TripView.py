@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import mixins, views
 from rest_framework.viewsets import GenericViewSet
@@ -47,9 +47,9 @@ class TripViewSet(mixins.RetrieveModelMixin,
                mixins.UpdateModelMixin,
                mixins.DestroyModelMixin,
                GenericViewSet):
-    authentication_classes = [IsAuthenticated, IsAirportOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAirportOrReadOnly]
     serializer_class = TripSerializer
-
+    queryset = Trip.objects.all()
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
