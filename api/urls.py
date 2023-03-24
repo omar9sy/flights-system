@@ -1,7 +1,7 @@
 from api.views import (
     book_seat, AirportViewSet, create_trip, search_trip, get_airport_trips,
     get_user_trips, get_airport_trip_reservations, UserDetailsView2,
-    add_email, AirportRegisterView, LoginViewWithRole, TripViewSet)
+    add_email, AirportRegisterView, LoginViewWithRole, TripViewSet, get_hotels_and_restaurants)
 from api.views.AdminView import update_balance, get_users
 from api.views.CommentView import get_comments
 from dj_rest_auth.registration.views import RegisterView
@@ -23,6 +23,7 @@ urlpatterns = [
     path('airports/me',get_airport_trips),
     path('airports/emails', add_email),
     path('airports/register', AirportRegisterView.as_view()),
+    path('hotels_and_restaurants', get_hotels_and_restaurants),
     # path('airports/my_reservations', AirportRegisterView.as_view()),
     path('users/balance', update_balance),
     path('users', get_users),
