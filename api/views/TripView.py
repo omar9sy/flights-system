@@ -27,16 +27,16 @@ def create_trip(request):
 
     trip = Trip.objects.create(**data, airport=airport)
     trip.save()
-    for _ in range(10):
+    for _ in range(6):
         obj = Seat.objects.create(trip=trip, level=1, cost=costs[0])
         obj.save()
 
-    for _ in range(20):
+    for _ in range(10):
         obj = Seat.objects.create(trip=trip, level=2, cost=costs[1])
         obj.save()
 
-    for _ in range(30):
-        obj = Seat.objects.create(trip=trip, level=2, cost=costs[2])
+    for _ in range(20):
+        obj = Seat.objects.create(trip=trip, level=3, cost=costs[2])
         obj.save()
 
     result = TripSerializer(trip)
