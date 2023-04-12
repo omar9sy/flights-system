@@ -43,6 +43,7 @@ class AirportRegisterSerializer(RegisterSerializer):
         airport = Airport(author=user, name=self.data.get('name'),
                           city=user.city, country=user.country)
         airport.save()
-        airport.photo = self.data.get('photo')
+        photo = request.data.get('photo')
+        airport.photo = photo
         airport.save()
         return user
