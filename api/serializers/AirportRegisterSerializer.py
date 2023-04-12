@@ -10,6 +10,7 @@ class AirportRegisterSerializer(RegisterSerializer):
     city = serializers.CharField(max_length=20, required=False)
     email = serializers.EmailField(required=True)
     name = serializers.CharField(max_length=20, required=False)
+    photo = serializers.ImageField(required=False)
 
     class Meta:
         model = AppUser
@@ -19,7 +20,8 @@ class AirportRegisterSerializer(RegisterSerializer):
             'country',
             'city',
             'first_name',
-            'last_name'
+            'last_name',
+            'photo'
         )
 
     def create(self, validated_data):
@@ -40,5 +42,7 @@ class AirportRegisterSerializer(RegisterSerializer):
         user.save()
         airport = Airport(author=user, name=self.data.get('name'),
                           city=user.city, country=user.country)
+        airport.save()
+        airport.photo = self.data.get('photo')
         airport.save()
         return user
